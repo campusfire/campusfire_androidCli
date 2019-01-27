@@ -7,7 +7,6 @@ package com.example.campusfire.main;
 
 public interface MainContract {
     interface View {
-        void showSignInScreen();
         void doBarcodeVerification();
     }
     interface Presenter {

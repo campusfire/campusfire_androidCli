@@ -27,6 +27,7 @@ ext {
     mockitoVersion = '1.10.19'
     junitVersion = '4.12'
     googleservicesVersion = '16.2.0'
+    volleyVersion = '1.1.0'
 }
 
 task clean(type: Delete) {

@@ -65,59 +65,38 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
-
-        if (requestCode == POST_URL_REQUEST_CODE)
-        {
-            if (isSuccess)
-            {
-                Log.e("MainActivity", "onResult() called 2");
-                responseTv.setText(jsonObject.toString());
-            }
-            else
-            {
-                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else if (requestCode == GET_URL_REQUEST_CODE)
-        {
-            if (isSuccess)
-            {
-                Log.e("MainActivity", "onResult() called 1");
-                responseTv.setText(jsonObject.toString());
-            }
-        }
-        else if (requestCode == POST_URL_AUTHPLAYER1_REQUEST_CODE)
-        {
-            if (isSuccess)
-            {
-                Log.e("MainActivity", "onResult() called 3");
-
-                String resultatAuth = jsonObject.getString("AuthStatus");
-
-                if (resultatAuth.equals("AuthFailed")) {
-                    Toast.makeText(this, "Authentication failed, try again", Toast.LENGTH_SHORT).show();
-                    Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
-                    startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
-                }
-                else {
-                    Player = jsonObject.getString("Player");
-                    Log.d(Player,TAGPLAYER);
-                    Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
-                    Intent openSecondAct = new Intent(this, RetrofitActivity.class);
-                    openSecondAct.putExtra("player", Player);
-                    startActivity(openSecondAct);
-                }
-            }
-
-        }
-
-        if (progressDialog != null && progressDialog.isShowing())
-            progressDialog.dismiss();
+        mPresenter.handleOnResult(requestCode, isSuccess, jsonObject, volleyError, progressDialog);
     }
 
     @Override
     public void doBarcodeVerification() {
         Intent intentBarcode = new Intent(this, BarcodeCaptureActivity.class);
         startActivityForResult(intentBarcode,REQUEST_CODE);
+    }
+
+    @Override
+    public void actionOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
+        if (isSuccess)
+        {
+            Log.e("MainActivity", "onResult() called QrCode server check");
+
+            String resultatAuth = jsonObject.getString("AuthStatus");
+
+            if (resultatAuth.equals("AuthFailed")) {
+                Toast.makeText(this, "Authentication failed, try again", Toast.LENGTH_SHORT).show();
+                Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
+                startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
+            }
+            else {
+                Player = jsonObject.getString("Player");
+                Log.d(Player,TAGPLAYER);
+                Toast.makeText(this, "Welcome to CampusFire", Toast.LENGTH_SHORT).show();
+                Intent openSecondAct = new Intent(this, RetrofitActivity.class);
+                openSecondAct.putExtra("player", Player);
+                startActivity(openSecondAct);
+            }
+        }
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
     }
 }

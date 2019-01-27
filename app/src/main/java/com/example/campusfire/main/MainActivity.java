@@ -14,6 +14,7 @@ import com.android.volley.VolleyError;
 import com.example.campusfire.R;
 import com.example.campusfire.barcode.BarcodeCaptureActivity;
 import com.example.campusfire.network.NetworkController;
+import com.example.campusfire.retrofit.RetrofitActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     Player = jsonObject.getString("Player");
                     Log.d(Player,TAGPLAYER);
                     Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
-                    Intent openSecondAct = new Intent(this,RetrofitUploadActivity.class);
+                    Intent openSecondAct = new Intent(this, RetrofitActivity.class);
                     openSecondAct.putExtra("player", Player);
                     startActivity(openSecondAct);
                 }

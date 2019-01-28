@@ -1,5 +1,11 @@
 package com.example.campusfire.main;
 
+import android.app.ProgressDialog;
+
+import com.android.volley.VolleyError;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +24,11 @@ public class MainPresenterTest {
     private MainContract.View mView;
 
     private MainPresenter mPresenter;
+    private int requestcode;
+    private boolean isSuccess;
+    private JSONObject jsonObject;
+    private VolleyError volleyError;
+    private ProgressDialog progressDialog;
 
     @Before
     public void setUp() throws Exception {
@@ -26,8 +37,19 @@ public class MainPresenterTest {
     }
 
     @Test
-    public void handleSignInButtonClick() {
+    public void test_view_ok() {
         mPresenter.handleSignInButtonClick();
-        verify(mView).showSignInScreen();
+        verify(mView).doBarcodeVerification();
+    }
+
+    @Test
+    public void qrCode_validation(){
+
+    }
+
+    @Test
+    public void handleOnResult() throws JSONException {
+        mPresenter.handleOnResult(requestcode,isSuccess,jsonObject,volleyError,progressDialog);
+        verify(mView).actionOnResult(requestcode,isSuccess,jsonObject,volleyError,progressDialog);
     }
 }

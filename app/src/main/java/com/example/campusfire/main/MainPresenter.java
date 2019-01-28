@@ -20,7 +20,22 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void handleOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
-        mView.actionOnResult(requestCode, isSuccess, jsonObject, volleyError, progressDialog);
+        if (isSuccess) {
+            String resultatAuth = jsonObject.getString("AuthStatus");
+            if (resultatAuth.equals("AuthFailed")){
+                mView.toaster("Authentication failed, try again");
+                mView.retryBarcodeCheck();
+            }
+            else {
+                String Player = jsonObject.getString("Player");
+                mView.toaster("Welcome to paradise TOTEM");
+                mView.enterParadiseTotem(Player);
+            }
+        }
+        else
+        {
+            mView.toaster("Something went wrong");
+        }
     }
 
     @Override

@@ -15,7 +15,9 @@ import org.json.JSONObject;
 public interface MainContract {
     interface View {
         void doBarcodeVerification();
-        void actionOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException;
+        void toaster(String txtToast);
+        void retryBarcodeCheck();
+        void enterParadiseTotem(String Player);
     }
     interface Presenter {
         void handleOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException;

@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     private MainPresenter mPresenter;
 
     private Button barcodeButton;
-    private TextView responseTv;
-    private String Player;
     private String TAGPLAYER="TAGPLAYER";
 
     //For Gesture detection
@@ -65,7 +63,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
+        Log.e("MainActivity", "onResult() called QrCode server check");
         mPresenter.handleOnResult(requestCode, isSuccess, jsonObject, volleyError, progressDialog);
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
     }
 
     @Override
@@ -75,28 +76,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void actionOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
-        if (isSuccess)
-        {
-            Log.e("MainActivity", "onResult() called QrCode server check");
+    public void retryBarcodeCheck(){
+        Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
+        startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
+    }
 
-            String resultatAuth = jsonObject.getString("AuthStatus");
+    @Override
+    public void enterParadiseTotem(String Player){
+        Log.d(Player,TAGPLAYER);
+        Intent openSecondAct = new Intent(this,RetrofitActivity.class);
+        openSecondAct.putExtra("player", Player);
+        startActivity(openSecondAct);
+    }
 
-            if (resultatAuth.equals("AuthFailed")) {
-                Toast.makeText(this, "Authentication failed, try again", Toast.LENGTH_SHORT).show();
-                Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
-                startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
-            }
-            else {
-                Player = jsonObject.getString("Player");
-                Log.d(Player,TAGPLAYER);
-                Toast.makeText(this, "Welcome to CampusFire", Toast.LENGTH_SHORT).show();
-                Intent openSecondAct = new Intent(this, RetrofitActivity.class);
-                openSecondAct.putExtra("player", Player);
-                startActivity(openSecondAct);
-            }
-        }
-        if (progressDialog != null && progressDialog.isShowing())
-            progressDialog.dismiss();
+    @Override
+    public void toaster(String txtToast){
+        Toast.makeText(this,txtToast,Toast.LENGTH_SHORT).show();
     }
 }

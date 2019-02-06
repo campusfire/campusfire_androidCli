@@ -22,6 +22,7 @@ public class MainPresenter implements MainContract.Presenter {
     public void handleOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
         if (isSuccess) {
             String resultatAuth = jsonObject.getString("AuthStatus");
+            mView.toaster(resultatAuth);
             if (resultatAuth.equals("AuthFailed")){
                 mView.toaster("Authentication failed, try again");
                 mView.retryBarcodeCheck();

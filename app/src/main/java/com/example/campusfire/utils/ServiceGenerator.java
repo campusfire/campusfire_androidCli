@@ -4,15 +4,13 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.example.campusfire.network.UrlConstants.POST_URL;
+import static com.example.campusfire.network.UrlConstants.GET_URL;
 
 public class ServiceGenerator {
 
-    private static final String BASE_URL = "http://node.oignon.ovh1.ec-m.fr/";
-
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(GET_URL)
                     .addConverterFactory(GsonConverterFactory.create());
 
     private static Retrofit retrofit = builder.build();

@@ -10,11 +10,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.example.campusfire.R;
 import com.example.campusfire.barcode.BarcodeCaptureActivity;
 import com.example.campusfire.network.NetworkController;
 import com.example.campusfire.retrofit.RetrofitActivity;
+import com.google.android.gms.common.api.CommonStatusCodes;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,16 +49,20 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         barcodeButton = (Button) findViewById(R.id.barcodeButton);
+        mPresenter = new MainPresenter(this);
 
         barcodeButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Log.e("MainActivity","onClick() was called");
         switch (v.getId())
         {
             case R.id.barcodeButton:
-                mPresenter.handleSignInButtonClick();
+                Log.e("MainActivity","case barcodeButton was triggered");
+                Intent intentBarcode = new Intent(this,BarcodeCaptureActivity.class);
+                startActivityForResult(intentBarcode,REQUEST_CODE);
                 break;
         }
     }
@@ -71,18 +77,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void doBarcodeVerification() {
+        Log.e("MainActivity","doBarcodeVerification() was called");
         Intent intentBarcode = new Intent(this, BarcodeCaptureActivity.class);
         startActivityForResult(intentBarcode,REQUEST_CODE);
     }
 
     @Override
     public void retryBarcodeCheck(){
+        Log.e("MainActivity","retryBarcodeCheck() was called");
         Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
         startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
     }
 
     @Override
     public void enterParadiseTotem(String Player){
+        Log.e("MainActivity","enterParadiseTotem() was called");
         Log.d(Player,TAGPLAYER);
         Intent openSecondAct = new Intent(this,RetrofitActivity.class);
         openSecondAct.putExtra("player", Player);
@@ -92,5 +101,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void toaster(String txtToast){
         Toast.makeText(this,txtToast,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == CommonStatusCodes.SUCCESS && requestCode == REQUEST_CODE){
+            if(data!=null && data.hasExtra("barcode")){
+                HashMap<String,String> stringParamsAuth = new HashMap<>();
+                stringParamsAuth.put("barcodeSent",data.getStringExtra("barcode"));
+                NetworkController.getInstance().connect(this,POST_URL_AUTHPLAYER1_REQUEST_CODE, Request.Method.POST, stringParamsAuth,this);
+            }
+        }
     }
 }

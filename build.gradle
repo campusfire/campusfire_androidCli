@@ -28,6 +28,8 @@ ext {
     junitVersion = '4.12'
     googleservicesVersion = '16.2.0'
     volleyVersion = '1.1.0'
+    retrofit2gsonVersion = '2.3.0'
+    retrofit2Version = '2.5.0'
 }
 
 task clean(type: Delete) {

@@ -38,9 +38,4 @@ public class MainPresenter implements MainContract.Presenter {
             mView.toaster("Something went wrong");
         }
     }
-
-    @Override
-    public void handleSignInButtonClick() {
-        mView.doBarcodeVerification();
-    }
 }

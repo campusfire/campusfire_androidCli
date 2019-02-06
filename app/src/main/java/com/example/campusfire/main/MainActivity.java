@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,9 +22,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import static com.example.campusfire.network.UrlConstants.GET_URL_REQUEST_CODE;
 import static com.example.campusfire.network.UrlConstants.POST_URL_AUTHPLAYER1_REQUEST_CODE;
-import static com.example.campusfire.network.UrlConstants.POST_URL_REQUEST_CODE;
 
 /**
  * Displays the Main screen
@@ -73,13 +70,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mPresenter.handleOnResult(requestCode, isSuccess, jsonObject, volleyError, progressDialog);
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
-    }
-
-    @Override
-    public void doBarcodeVerification() {
-        Log.e("MainActivity","doBarcodeVerification() was called");
-        Intent intentBarcode = new Intent(this, BarcodeCaptureActivity.class);
-        startActivityForResult(intentBarcode,REQUEST_CODE);
     }
 
     @Override

@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.example.campusfire.R;
+import com.example.campusfire.drawing.DrawingActivity;
 import com.example.campusfire.gesture.DetectSwipeGestureListener;
 import com.example.campusfire.network.NetworkController;
 import com.example.campusfire.utils.FileService;
@@ -61,10 +62,11 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
 
     //These are the components used for the image upload
     private int REQ_CODE=100;
+    private int DRAW_CODE=200;
     private String image="data";
     private String imageName="Image.jpg";
     private Button uploadButton, btnselectpic, downloadButton, selectGetButton, uploadTextButton;
-    private ImageButton logoutButton;
+    private ImageButton logoutButton, drawingButton;
     private EditText txtUpload;
     private ImageView imageview;
     private ProgressDialog dialog = null;
@@ -107,6 +109,7 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
         txtUpload = (EditText)findViewById(R.id.txtUpload);
         uploadTextButton = (Button)findViewById(R.id.button_upload_text);
         logoutButton = (ImageButton) findViewById(R.id.button_logout);
+        drawingButton = (ImageButton) findViewById(R.id.button_drawing);
 
         btnselectpic.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
@@ -114,6 +117,7 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
         selectGetButton.setOnClickListener(this);
         uploadTextButton.setOnClickListener(this);
         logoutButton.setOnClickListener(this);
+        drawingButton.setOnClickListener(this);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
@@ -229,6 +233,9 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
                 break;
             case R.id.button_logout:
                 logout();
+            case R.id.button_drawing:
+                Intent drawingIntent = new Intent(this, DrawingActivity.class);
+                startActivityForResult(drawingIntent,DRAW_CODE);
         }
     }
 

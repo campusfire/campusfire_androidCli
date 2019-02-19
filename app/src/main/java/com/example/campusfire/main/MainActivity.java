@@ -67,7 +67,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
         Log.e("MainActivity", "onResult() called QrCode server check");
-        mPresenter.handleOnResult(requestCode, isSuccess, jsonObject, volleyError, progressDialog);
+        String resultatAuth = null;
+        String Player = null;
+        if (jsonObject != null) {
+            resultatAuth = jsonObject.getString("AuthStatus");
+            Player = jsonObject.getString("Player");
+        }
+        mPresenter.handleOnResult(requestCode, isSuccess, resultatAuth, Player, volleyError, progressDialog);
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
     }

@@ -19,6 +19,6 @@ public interface MainContract {
         void enterParadiseTotem(String Player);
     }
     interface Presenter {
-        void handleOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException;
+        void handleOnResult(int requestCode, boolean isSuccess, String resultatAuth, String Player, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException;
     }
 }

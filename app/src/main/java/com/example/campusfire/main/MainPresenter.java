@@ -19,23 +19,21 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void handleOnResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
+    public void handleOnResult(int requestCode, boolean isSuccess, String resultatAuth, String Player, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
         if (isSuccess) {
-            String resultatAuth = jsonObject.getString("AuthStatus");
             mView.toaster(resultatAuth);
             if (resultatAuth.equals("AuthFailed")){
                 mView.toaster("Authentication failed, try again");
                 mView.retryBarcodeCheck();
             }
             else {
-                String Player = jsonObject.getString("Player");
                 mView.toaster("Welcome to paradise TOTEM");
                 mView.enterParadiseTotem(Player);
             }
         }
         else
         {
-            mView.toaster("Something went wrong");
+            mView.toaster("Network Connection went wrong");
         }
     }
 }

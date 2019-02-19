@@ -52,13 +52,16 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.example.campusfire.network.UrlConstants.GET_URL_REQUEST_CODE;
 import static com.example.campusfire.network.UrlConstants.POST_URL;
+import static com.example.campusfire.network.UrlConstants.POST_URL_AUTHPLAYER1_REQUEST_CODE;
 import static com.example.campusfire.network.UrlConstants.POST_URL_LOGOUT_CODE;
 import static com.example.campusfire.network.UrlConstants.POST_URL_REQUEST_CODE;
 import static com.example.campusfire.network.UrlConstants.POST_URL_TEXT_REQUEST_CODE;
 
-public class RetrofitActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener, NetworkController.ResultListener{
+public class RetrofitActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener, NetworkController.ResultListener, RetrofitContract.View {
 
+    private RetrofitPresenter rPresenter;
     //These are the components used for the image upload
     private int REQ_CODE=100;
     private String image="data";
@@ -92,6 +95,8 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrofit);
+
+        rPresenter = new RetrofitPresenter(this);
 
         //Retrieve information on the player
         Player = this.getIntent().getStringExtra("player");
@@ -138,25 +143,34 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            getAccelerometer(event);
+            float[] values = event.values;
+            float gravity = SensorManager.GRAVITY_EARTH;
+            long actualTime = event.timestamp;
+            rPresenter.getAccelerometer(values, gravity, actualTime);
+            lastUpdate = actualTime;
         }
     }
 
-    private void getAccelerometer(SensorEvent event) {
-        float[] values = event.values;
-        // Movement
-        float x = values[0];
-        float y = values[1];
-        float z = values[2];
+    @Override
+    public void toaster(String txtToast){
+        Toast.makeText(this,txtToast,Toast.LENGTH_SHORT).show();
+    }
 
-        float accelationSquareRoot = (x * x + y * y + z * z)
-                / (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH);
-        long actualTime = event.timestamp;
-        if (accelationSquareRoot >= 6) //
-        {
-            lastUpdate = actualTime;
-            Toast.makeText(this, "Acceleration detected", Toast.LENGTH_SHORT)
-                    .show();
+    @Override
+    public void logger(String type, String tag, String logMessage){
+        switch (type){
+            case "v":
+                Log.v(tag,logMessage);
+                break;
+            case "e":
+                Log.e(tag,logMessage);
+                break;
+            case "i":
+                Log.i(tag,logMessage);
+                break;
+            case "d":
+                Log.d(tag,logMessage);
+                break;
         }
     }
 
@@ -216,7 +230,6 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
                 startActivityForResult(intent, REQ_CODE);
                 break;
             case R.id.button_upload:
-                //dialog.show();
                 uploadFile(selectedImageUri);
                 break;
             case R.id.button_download:
@@ -224,39 +237,31 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
                 getRetrofitImage();
                 break;
             case R.id.button_upload_text:
-                uploadText();
-                Log.v(TAGUPDTXT, "UPDTXT button clicked");
+                String sentText = txtUpload.getText().toString();
+                rPresenter.uploadText(sentText);
                 break;
             case R.id.button_logout:
-                logout();
+                rPresenter.logout(Player);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void uploadFile(Uri selectedImageUri) {
         // create upload service client
-        FileService.Upload service =
-                ServiceGenerator.createService(FileService.Upload.class);
+        FileService.Upload service = ServiceGenerator.createService(FileService.Upload.class);
 
         // use the FileUtils to get the actual file by uri
         File file = FileUtils.getFile(this, selectedImageUri);
 
         // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse(getContentResolver().getType(selectedImageUri)),
-                        file
-                );
+        RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(selectedImageUri)), file);
 
         // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("Image", file.getName(), requestFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("Image", file.getName(), requestFile);
 
         // add another part within the multipart request
         String descriptionString = "hello, this is description speaking";
-        RequestBody description =
-                RequestBody.create(
-                        okhttp3.MultipartBody.FORM, descriptionString);
+        RequestBody description = RequestBody.create(okhttp3.MultipartBody.FORM, descriptionString);
 
         // finally, execute the request
         Call<ResponseBody> call = service.upload(description, body);
@@ -265,7 +270,6 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
@@ -282,29 +286,19 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
     }
 
     void getRetrofitImage() {
-
         Log.v(TAGDL,"getRetrofitImage accessed");
-
         // create upload service client
-        FileService.Get service =
-                ServiceGenerator.createService(FileService.Get.class);
-
+        FileService.Get service = ServiceGenerator.createService(FileService.Get.class);
         Log.v(TAGDL,"FileGetService créé");
-
         Call<ResponseBody> call = service.getImageDetails();
-
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v(TAGDL,"onResponse accessed");
                 try {
-
                     Log.d(TAGDL, "Response came from server");
-
                     boolean FileDownloaded = DownloadImage(response.body());
-
                     Log.d(TAGDL, "Image is downloaded and saved : " + FileDownloaded);
-
                 } catch (Exception e) {
                     Log.d(TAGDL, "There is an error");
                     e.printStackTrace();
@@ -317,7 +311,6 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
             }
         });
     }
-
 
     private boolean DownloadImage(ResponseBody body) {
 
@@ -383,24 +376,23 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
         return true;
     }
 
-    private void uploadText(){
-
-        String sentText = txtUpload.getText().toString();
-        Log.v(TAGUPDTXT, "text to send : " + sentText);
-
-        if (!sentText.equals("")){
-            Log.v(TAGUPDTXT, "entered in If");
-            HashMap<String, String> stringParams = new HashMap<>();
-            stringParams.put("sentText", sentText);
-            NetworkController.getInstance().connect(this, POST_URL_TEXT_REQUEST_CODE, Request.Method.POST, stringParams, this);
+    @Override
+    public void network_connect(int requestCode, HashMap<String, String> params){
+        switch (requestCode){
+            case GET_URL_REQUEST_CODE:
+                break;
+            case POST_URL_REQUEST_CODE:
+                break;
+            case POST_URL_AUTHPLAYER1_REQUEST_CODE:
+                break;
+            case POST_URL_TEXT_REQUEST_CODE:
+                NetworkController.getInstance().connect(this, requestCode, Request.Method.POST, params, this);
+                break;
+            case POST_URL_LOGOUT_CODE:
+                NetworkController.getInstance().connect(this,requestCode,Request.Method.POST,params,this);
+                finish();
+                break;
         }
-    }
-
-    private void logout(){
-        HashMap<String, String> stringParamsLogout = new HashMap<>();
-        stringParamsLogout.put("player", Player);
-        NetworkController.getInstance().connect(this, POST_URL_LOGOUT_CODE, Request.Method.POST, stringParamsLogout, this);
-        finish();
     }
 
     @Override
@@ -409,12 +401,12 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
         {
             if (isSuccess)
             {
-                Toast.makeText(this, "Texte envoyé", Toast.LENGTH_SHORT).show();
+                toaster("Texte envoyé");
                 txtUpload.getText().clear();
             }
             else
             {
-                Toast.makeText(this, "Erreur d'envoi du texte", Toast.LENGTH_SHORT).show();
+                toaster("Erreur d'envoi du texte");
             }
         }
         if (progressDialog != null && progressDialog.isShowing())

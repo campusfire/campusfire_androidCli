@@ -19,15 +19,18 @@ import static org.mockito.Mockito.verify;
 /**
  * Local unit tests for the Main Presenter
  */
+
 public class MainPresenterTest {
 
     @Mock
     private MainContract.View mView;
 
+    @Mock
+    private JSONObject jsonObject;
+
     private MainPresenter mPresenter;
     private int requestcode;
     private boolean isSuccess;
-    private JSONObject jsonObject;
     private VolleyError volleyError;
     private ProgressDialog progressDialog;
 
@@ -35,22 +38,25 @@ public class MainPresenterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         mPresenter = new MainPresenter(mView);
-        // Make presenter a mock while using mock view created above
-        //mPresenter = Mockito.spy(new MainPresenter(mView));
     }
 
     @Test
-    public void test_view_ok() {
-        mPresenter.handleSignInButtonClick();
-        verify(mView).doBarcodeVerification();
+    public void failure_server_connect() throws JSONException {
+        isSuccess = false;
+        mPresenter.handleOnResult(requestcode, isSuccess, jsonObject, volleyError, progressDialog);
+        verify(mView).toaster("Something went wrong");
     }
 
     @Test
-    public void qrCode_validation(){
-
-    }
-
-    @Test
-    public void handleOnResult() throws JSONException {
+    public void auth_failed() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        isSuccess = true;
+        jsonObject.put("AuthStatus","AuthFailed");
+        System.out.println(jsonObject.toString());
+        mPresenter.handleOnResult(requestcode, isSuccess, jsonObject, volleyError, progressDialog);
+        String resultatAuth = jsonObject.getString("AuthStatus");
+        verify(mView).toaster(resultatAuth);
+        verify(mView).toaster("Authentication failed, try agai");
+        verify(mView).retryBarcodeCheck();
     }
 }

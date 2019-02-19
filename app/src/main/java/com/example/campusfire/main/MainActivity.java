@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void enterParadiseTotem(String Player){
         Log.e("MainActivity","enterParadiseTotem() was called");
-        Log.d(Player,TAGPLAYER);
+        Log.d(TAGPLAYER,Player);
         Intent openSecondAct = new Intent(this,RetrofitActivity.class);
         openSecondAct.putExtra("player", Player);
         startActivity(openSecondAct);

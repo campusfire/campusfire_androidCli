@@ -235,6 +235,7 @@ public class RetrofitActivity extends AppCompatActivity implements GestureDetect
                 logout();
             case R.id.button_drawing:
                 Intent drawingIntent = new Intent(this, DrawingActivity.class);
+                drawingIntent.putExtra("Player",Player);
                 startActivityForResult(drawingIntent,DRAW_CODE);
         }
     }

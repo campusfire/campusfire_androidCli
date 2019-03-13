@@ -1,42 +1,37 @@
 package com.example.campusfire.drawing;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 import com.example.campusfire.R;
-
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.URISyntaxException;
 
 import static com.example.campusfire.network.UrlConstants.SOCKET_URL;
 
 public class DrawingActivity extends AppCompatActivity {
 
-    DrawingView dv ;
+    private DrawingView dv;
     private Paint mPaint;
     private Socket socket;
     private String Player;
     private String TAGDRAW="TAGDRAW";
+    private Button resetButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +46,8 @@ public class DrawingActivity extends AppCompatActivity {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(12);
+
+        resetButton = (Button)findViewById(R.id.resetButton);
 
         Player = this.getIntent().getStringExtra("Player");
 
@@ -74,6 +71,7 @@ public class DrawingActivity extends AppCompatActivity {
 
         }
     }
+
     public class DrawingView extends View {
 
         private Bitmap mBitmap;
@@ -100,6 +98,7 @@ public class DrawingActivity extends AppCompatActivity {
             circlePaint.setStrokeWidth(4f);
         }
 
+
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
@@ -111,9 +110,9 @@ public class DrawingActivity extends AppCompatActivity {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            canvas.drawBitmap( mBitmap, 0, 0, mBitmapPaint);
+            /*canvas.drawBitmap( mBitmap, 0, 0, mBitmapPaint);
             canvas.drawPath( mPath,  mPaint);
-            canvas.drawPath( circlePath,  circlePaint);
+            canvas.drawPath( circlePath,  circlePaint);*/
             Log.d(TAGDRAW,"on draw");
         }
 
@@ -134,7 +133,7 @@ public class DrawingActivity extends AppCompatActivity {
             height = getHeight();
             width = getWidth();
             if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
+                //mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
 
                 JSONObject messageLines = new JSONObject();
                 JSONObject pos_prev = new JSONObject();
@@ -199,5 +198,11 @@ public class DrawingActivity extends AppCompatActivity {
             }
             return true;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        socket.emit("reset_line");
     }
 }

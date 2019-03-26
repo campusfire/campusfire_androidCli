@@ -63,6 +63,8 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
         return true;
     }
 
+
     public void setActivity(RetrofitActivity retrofitUploadActivity) {
+        this.activity = retrofitUploadActivity;
     }
 }

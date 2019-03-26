@@ -3,7 +3,7 @@ package com.example.campusfire.network;
 public interface UrlConstants {
     String GET_URL = "http://node.oignon.ovh1.ec-m.fr/";
     String POST_URL = "http://node.oignon.ovh1.ec-m.fr/file-upload";
-    String POST_URL_AUTH_PLAYER1 = "http://node.oignon.ovh1.ec-m.fr/authenticationPlayer1";
+    String POST_URL_AUTH_PLAYER1 = "http://node.oignon.ovh1.ec-m.fr/authenticationPlayer";
     String POST_URL_TEXT = "http://node.oignon.ovh1.ec-m.fr/postText";
     String POST_URL_LOGOUT = "http://node.oignon.ovh1.ec-m.fr/logout";
     String SOCKET_URL = "http://node.oignon.ovh1.ec-m.fr:10410";
